@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>reveal.js - Markdown Demo</title>
+
+    <link rel="stylesheet" href="bower_components/reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="bower_components/reveal.js/css/theme/black.css" id="theme">
+    <link rel="stylesheet" href="bower_components/reveal.js/lib/css/zenburn.css">
+</head>
+
+<body>
+
+<div class="reveal">
+    <div class="slides">
+        <section data-markdown data-separator="---">
+            <script type="text/template">
+                ## Mocking with Microservices
+                ---
+                ## What is mocking (or stubbing)?
+
+                ---
+                ## The problem with mocks
+                - Can be hard to build <!-- .element: class="fragment" -->
+                - Hard to maintain <!-- .element: class="fragment" -->
+                - Extra hard when workink with microservices <!-- .element: class="fragment" -->
+                ---
+                ## To solve this, we will be using
+                - Spring Test (https://github.com/spring-projects/spring-framework)<br>
+                - Spring REST Docs (https://github.com/spring-projects/spring-restdocs)<br>
+                - Wiremock (https://github.com/tomakehurst/wiremock)
+                ---
+                ## Spring Test
+                - Framework for testing Spring MVC apps
+                - Similar to RestAssured
+                ---
+                ## Spring Test - Example
+                ```java
+                this.mockMvc.perform(
+                    get("/myapi")
+                        .param("param", "value"))
+                    .andExpect(status().isOk())
+                ```
+                ---
+                ## Spring REST Docs
+                - Works by saving _reqeust_ and _response_ from Spring Test
+                - Can use this information to create documentation
+                ---
+                ## Spring REST Docs - Example
+                #### Set up mock mvc
+                ```java
+                this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
+                    .apply(documentationConfiguration(this.restDocumentation)
+                        .snippets()
+                        .withDefaults(curlRequest()))
+                        .build();
+                ```
+                #### Create a test
+                ```java
+                this.mockMvc.perform(
+                    get("/myapi")
+                        .param("param", "value"))
+                        .andExpect(status().isOk()
+                        .andDo(document("NameOfTest")))
+                ```
+                #### Result in curl-reqeust.adoc
+                ```bash
+                $ curl 'http://localhost:8080?param=value' -i
+                ```
+                ---
+                ## Wiremock
+                - A library for stubbing and mocking web services.
+                - Create a web server, on-the-fly- in your tests
+                ---
+                ## Wiremock - Example
+                ```java
+                @Rule
+                public WireMockRule wireMockRule = new WireMockRule();
+
+                ```
+                ```java
+                stubFor(get(urlEqualTo("/myapi"))
+                    .willReturn(aResponse()
+                    .withHeader("Content-Type", "text/plain")
+                    .withBody("Hello world!")));
+                ```
+                <!-- .element: class="fragment" -->
+                Or as JSON<!-- .element: class="fragment" -->
+                ```json
+                {
+                    "request": {
+                        "method": "GET",
+                        "url": "/some/thing"
+                    },
+                    "response": {
+                        "status": 200,
+                        "body": "Hello world!",
+                        "headers": {
+                        "Content-Type": "text/plain"
+                    }
+                }
+                ```
+                <!-- .element: class="fragment" -->
+                ---
+                ## So how can we use these 3 tools together?
+                - Remember that we said that Spring Rest Docs
+                "works by saving reqeust and response from Spring Test" <!-- .element: class="fragment" -->
+                - What if instead of creating a curl command we can create a Wiremock JSON file!<!-- .element: class="fragment" -->
+                ---
+                ## The idea
+                - Create a custom "documenter" (actually called sippets) for Wiremock<!-- .element: class="fragment" -->
+                - Create tests on the API that "documents" Wiremock JSON<!-- .element: class="fragment" -->
+                - Make build JSON files available to client<!-- .element: class="fragment" -->
+                - Create tests in the client that downloads and loads the Wiremock JSON<!-- .element: class="fragment" -->
+                ---
+                ## At Autocom we
+                - Created mock-tools library that can build an load Wiremock JSON<!-- .element: class="fragment" -->
+                - Create a zip containing Wiremock JSON and upload this to Nexus<!-- .element: class="fragment" -->
+                - Download zip with maven<!-- .element: class="fragment" -->
+                - Run the tests!<!-- .element: class="fragment" -->
+            </script>
+        </section>
+
+    </div>
+</div>
+
+<script src="bower_components/reveal.js/lib/js/head.min.js"></script>
+<script src="bower_components/reveal.js/js/reveal.js"></script>
+
+<script>
+
+    Reveal.initialize({
+        controls: false,
+        progress: true,
+        history: true,
+        center: true,
+        dependencies: [
+            {
+                src: 'bower_components/reveal.js/lib/js/classList.js',
+                condition: function () {
+                    return !document.body.classList;
+                }
+            },
+            {
+                src: 'bower_components/reveal.js/plugin/markdown/marked.js',
+                condition: function () {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            },
+            {
+                src: 'bower_components/reveal.js/plugin/markdown/markdown.js',
+                condition: function () {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            },
+            {
+                src: 'bower_components/reveal.js/plugin/highlight/highlight.js',
+                async: true,
+                callback: function () {
+                    hljs.initHighlightingOnLoad();
+                }
+            }
+        ]
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "mocking",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "reveal.js": "https://github.com/hakimel/reveal.js.git#dev"
+  }
+}
