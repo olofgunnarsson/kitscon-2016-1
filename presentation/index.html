@@ -4,11 +4,11 @@
 <head>
     <meta charset="utf-8">
 
-    <title>reveal.js - Markdown Demo</title>
+    <title>Mocking with Microservices</title>
 
     <link rel="stylesheet" href="bower_components/reveal.js/css/reveal.css">
-    <link rel="stylesheet" href="bower_components/reveal.js/css/theme/black.css" id="theme">
-    <link rel="stylesheet" href="bower_components/reveal.js/lib/css/zenburn.css">
+    <link rel="stylesheet" href="bower_components/reveal.js/css/theme/simple.css" id="theme">
+    <link rel="stylesheet" href="bower_components/highlight.js/src/styles/github-gist.css">
 </head>
 
 <body>
@@ -19,13 +19,20 @@
             <script type="text/template">
                 ## Mocking with Microservices
                 ---
-                ## What is mocking (or stubbing)?
-
+                ## This presentation
+                - Tools used when mocking web based microservices
+                - Mocking at Autocom
+                - Demo application
                 ---
-                ## The problem with mocks
+                ## What is mocking?
+                - __Fake__ _objects actually have working implementations, but usually take some shortcut_
+                - __Stubs__ _provide canned answers to calls made during the test_
+                - __Mocks__ _are objects pre-programmed with expectations which form a specification of the calls they are expected to receive_
+                ---
+                ## Problems with mocks
                 - Can be hard to build <!-- .element: class="fragment" -->
                 - Hard to maintain <!-- .element: class="fragment" -->
-                - Extra hard when workink with microservices <!-- .element: class="fragment" -->
+                - Extra hard when working with microservices <!-- .element: class="fragment" -->
                 ---
                 ## To solve this, we will be using
                 - Spring Test (https://github.com/spring-projects/spring-framework)<br>
@@ -49,7 +56,7 @@
                 - Can use this information to create documentation
                 ---
                 ## Spring REST Docs - Example
-                #### Set up mock mvc
+                #### Set up mock mvc<!-- .element: class="fragment" -->
                 ```java
                 this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                     .apply(documentationConfiguration(this.restDocumentation)
@@ -57,7 +64,8 @@
                         .withDefaults(curlRequest()))
                         .build();
                 ```
-                #### Create a test
+                <!-- .element: class="fragment" -->
+                #### Create a test<!-- .element: class="fragment" -->
                 ```java
                 this.mockMvc.perform(
                     get("/myapi")
@@ -65,14 +73,16 @@
                         .andExpect(status().isOk()
                         .andDo(document("NameOfTest")))
                 ```
-                #### Result in curl-reqeust.adoc
+                <!-- .element: class="fragment" -->
+                #### Result in curl-request.adoc<!-- .element: class="fragment" -->
                 ```bash
                 $ curl 'http://localhost:8080?param=value' -i
                 ```
+                <!-- .element: class="fragment" -->
                 ---
                 ## Wiremock
                 - A library for stubbing and mocking web services.
-                - Create a web server, on-the-fly- in your tests
+                - Create a web server, on-the-fly, in your tests
                 ---
                 ## Wiremock - Example
                 ```java
@@ -110,16 +120,29 @@
                 - What if instead of creating a curl command we can create a Wiremock JSON file!<!-- .element: class="fragment" -->
                 ---
                 ## The idea
-                - Create a custom "documenter" (actually called sippets) for Wiremock<!-- .element: class="fragment" -->
+                - Create a custom "documenter" for Wiremock<!-- .element: class="fragment" -->
                 - Create tests on the API that "documents" Wiremock JSON<!-- .element: class="fragment" -->
-                - Make build JSON files available to client<!-- .element: class="fragment" -->
-                - Create tests in the client that downloads and loads the Wiremock JSON<!-- .element: class="fragment" -->
+                - Make built JSON files available to a consumer<!-- .element: class="fragment" -->
+                - Create tests in the consumer that downloads and loads the Wiremock JSON<!-- .element: class="fragment" -->
                 ---
-                ## At Autocom we
-                - Created mock-tools library that can build an load Wiremock JSON<!-- .element: class="fragment" -->
+                ## At Autocom
+                - Created mock-tools library that can build an load Wiremock JSON
+                ---
+                ## Mock-tools in action!
+                ####The producer <!-- .element: class="fragment" -->
+                - Has tests that uses mock-tools to output Wiremock JSON<!-- .element: class="fragment" -->
                 - Create a zip containing Wiremock JSON and upload this to Nexus<!-- .element: class="fragment" -->
-                - Download zip with maven<!-- .element: class="fragment" -->
-                - Run the tests!<!-- .element: class="fragment" -->
+
+                ####The Consumer<!-- .element: class="fragment" -->
+                - Downloads zip with Maven<!-- .element: class="fragment" -->
+                - Uses mock-tools to starts Wiremock with JSON in zip<!-- .element: class="fragment" -->
+                - Runs tests!<!-- .element: class="fragment" -->
+                ---
+                # DEMO
+                ---
+                ## Inspiration from
+                - http://presos.dsyer.com/decks/spring-cloud-dev-experience.html
+                - https://github.com/4finance/accurest
             </script>
         </section>
 
@@ -134,15 +157,10 @@
     Reveal.initialize({
         controls: false,
         progress: true,
+        transition: 'concave',
         history: true,
         center: true,
         dependencies: [
-            {
-                src: 'bower_components/reveal.js/lib/js/classList.js',
-                condition: function () {
-                    return !document.body.classList;
-                }
-            },
             {
                 src: 'bower_components/reveal.js/plugin/markdown/marked.js',
                 condition: function () {

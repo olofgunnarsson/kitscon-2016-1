@@ -11,6 +11,7 @@
     "tests"
   ],
   "dependencies": {
-    "reveal.js": "https://github.com/hakimel/reveal.js.git#dev"
+    "reveal.js": "https://github.com/hakimel/reveal.js.git",
+    "highlight.js": "https://github.com/isagalaev/highlight.js.git"
   }
 }
